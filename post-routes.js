@@ -50,4 +50,13 @@ route.put("/:id", (req, res) => {
     });
 });
 
+route.delete("/:id", (req, res) => {
+  Db.remove(req.params.id)
+    .then(res.status(200).json({ message: "Post was removed" }))
+    .catch(err => {
+      res.status(500).json({
+        message: "Error removing the post"
+      });
+    });
+});
 module.exports = route;
