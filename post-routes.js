@@ -36,4 +36,18 @@ route.post("/", (req, res) => {
     });
 });
 
+route.put("/:id", (req, res) => {
+  const id = req.params.id;
+  const post = req.body;
+  Db.update(id, post)
+    .then(post => {
+      res.status(200).json(post);
+    })
+    .catch(err => {
+      res.status(500).json({
+        message: "Error updating the post"
+      });
+    });
+});
+
 module.exports = route;
