@@ -5,7 +5,7 @@ const server = express();
 
 server.use(express.json());
 
-server.use("/posts", postsRoutes);
+server.use("/api/posts", postsRoutes);
 
 server.listen(5000, () => {
   console.log("\n*** Server Running on http://localhost:5000 ***\n");
