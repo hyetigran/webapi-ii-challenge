@@ -23,4 +23,17 @@ route.get("/:id", (req, res) => {
     });
 });
 
+route.post("/", (req, res) => {
+  const post = req.body;
+  Db.insert(post)
+    .then(post => {
+      res.status(201).json(post);
+    })
+    .catch(err => {
+      res.status(500).json({
+        message: "Error adding the post"
+      });
+    });
+});
+
 module.exports = route;
