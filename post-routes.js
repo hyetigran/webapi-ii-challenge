@@ -71,12 +71,12 @@ route.delete("/:id", (req, res) => {
 route.get("/:id/comments", (req, res) => {
   const postId = req.params.id;
   Db.findById(postId)
-    .then(id => {
-      console.log("id", id);
-      Db.findPostComments(id)
+    .then(post => {
+      //console.log("post", post);
+      Db.findPostComments(post[0].id)
         .then(result => {
-          console.log("happy path");
-          console.log(result);
+          // console.log("happy path");
+          // console.log(result);
           res.status(200).json(result);
         })
         .catch(err => {
@@ -90,14 +90,16 @@ route.get("/:id/comments", (req, res) => {
     });
 });
 
-route.get("/:id/comments", (req, res) => {
-  const postId = req.params.id;
+route.get("/:postId/comments/:commentId", (req, res) => {
+  const { postId, commentId } = req.params;
+  //console.log("commentID", commentId);
   Db.findById(postId)
-    .then(id => {
-      Db.findCommentById(id)
+    .then(post => {
+      // console.log("here", post);
+      Db.findCommentById(commentId)
         .then(result => {
-          console.log("happy path");
-          console.log(result);
+          //console.log("happy path");
+          //console.log(result);
           res.status(200).json(result);
         })
         .catch(err => {
@@ -111,25 +113,25 @@ route.get("/:id/comments", (req, res) => {
     });
 });
 
-route.post("/:id/comments", (req, res) => {
-  const postId = req.params.id;
-  Db.findById(postId)
-    .then(id => {
-      Db.insertComment(req.body)
-        .then(result => {
-          console.log("happy path");
-          console.log(result);
-          res.status(200).json(result);
-        })
-        .catch(err => {
-          res.status(404).json({ errorMessage: "Can't find that id!" });
-        });
-    })
-    .catch(err => {
-      res
-        .status(500)
-        .json({ errorMessage: "Can't find the comment in the post" });
-    });
-});
+// route.post("/:id/comments", (req, res) => {
+//   const postId = req.params.id;
+//   Db.findById(postId)
+//     .then(id => {
+//       Db.insertComment(req.body)
+//         .then(result => {
+//           console.log("happy path");
+//           console.log(result);
+//           res.status(200).json(body);
+//         })
+//         .catch(err => {
+//           res.status(404).json({ errorMessage: "Can't find that id!" });
+//         });
+//     })
+//     .catch(err => {
+//       res
+//         .status(500)
+//         .json({ errorMessage: "Can't find the comment in the post" });
+//     });
+// });
 
 module.exports = route;
