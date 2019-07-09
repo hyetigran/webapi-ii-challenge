@@ -54,9 +54,9 @@ route.delete("/:id", (req, res) => {
   Db.remove(req.params.id)
     .then(res => {
       if (res) {
-        res.status(200).json({ message: "The hub has been nuked" });
+        res.status(200).json({ message: "The post has been nuked" });
       } else {
-        res.status(404).json({ message: "The hub could not be found" });
+        res.status(404).json({ message: "The post could not be found" });
       }
     })
     .catch(err => {
@@ -65,8 +65,6 @@ route.delete("/:id", (req, res) => {
       });
     });
 });
-
-//route.get("/:id", (req, res) => {});
 
 route.get("/:id/comments", (req, res) => {
   const postId = req.params.id;
@@ -94,8 +92,8 @@ route.get("/:postId/comments/:commentId", (req, res) => {
   const { postId, commentId } = req.params;
   //console.log("commentID", commentId);
   Db.findById(postId)
-    .then(post => {
-      // console.log("here", post);
+    .then(res => {
+      // console.log("here", res);
       Db.findCommentById(commentId)
         .then(result => {
           //console.log("happy path");
@@ -113,25 +111,64 @@ route.get("/:postId/comments/:commentId", (req, res) => {
     });
 });
 
-// route.post("/:id/comments", (req, res) => {
-//   const postId = req.params.id;
-//   Db.findById(postId)
-//     .then(id => {
-//       Db.insertComment(req.body)
-//         .then(result => {
-//           console.log("happy path");
-//           console.log(result);
-//           res.status(200).json(body);
-//         })
-//         .catch(err => {
-//           res.status(404).json({ errorMessage: "Can't find that id!" });
+route.post("/:id/comments", (req, res) => {
+  const { params, body } = req;
+  Db.findById(params.id)
+    .then(result => {
+      console.log(result[0].id);
+      if (result[0].id > 0) {
+        if (body.text) {
+          const commentText = { ...body, post_id: params.id };
+          Db.insertComment(commentText)
+            .then(result => {
+              console.log("happy path");
+              console.log(result);
+              res.status(201).json(body);
+            })
+            .catch(err => {
+              res.status(404).json({ errorMessage: "Can't find that id!" });
+            });
+        } else {
+          res.status(400).json({
+            errorMessage: "Please provide text for the comment."
+          });
+        }
+      } else {
+        res.status(404).json({
+          message: "The post with the specified ID does not exist."
+        });
+      }
+    })
+    .catch(err => {
+      res
+        .status(500)
+        .json({ errorMessage: "Can't find the comment in the post" });
+    });
+});
+
+// Thanks for the great example Johnson!
+// route.post("/:id/comments", async (req, res) => {
+//   const { params, body } = req;
+//   try {
+//     const post = await db.findById(params.id);
+//     if (post.length > 0) {
+//       if (body.text) {
+//         const commentData = { ...body, post_id: params.id };
+//         const comment = await db.insertComment(commentData);
+//         res.json({
+//           comment
 //         });
-//     })
-//     .catch(err => {
-//       res
-//         .status(500)
-//         .json({ errorMessage: "Can't find the comment in the post" });
-//     });
+//       } else {
+//         res.status(400).json({
+//           errorMessage: "Please provide text for the comment."
+//         });
+//       }
+//     } else {
+//       res.status(404).json({
+//         message: "The post with the specified ID does not exist."
+//       });
+//     }
+//   } catch (err) {}
 // });
 
 module.exports = route;
